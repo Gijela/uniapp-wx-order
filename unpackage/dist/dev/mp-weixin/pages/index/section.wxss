@@ -1,0 +1,11 @@
+
+.pdfDemo.data-v-7a8bfaff {
+	width: 100vw;
+	padding: 12px;
+	border-bottom: 1px solid #eaecef;
+	color: #409eff;
+}
+.bt.data-v-7a8bfaff {
+	border-top: 1px solid #eaecef;
+}
+
