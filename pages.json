@@ -3,14 +3,14 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "天涯神贴(免费分享)"
+				"navigationBarTitleText": "天涯神贴收录"
 			}
 		},
 		{
 			"path" : "pages/common/webview",
 			"style" : 
 			{
-				"navigationBarTitleText" : "天涯神贴(免费分享)",
+				"navigationBarTitleText" : "天涯神贴收录",
 				"enablePullDownRefresh" : true
 			}
 		},
@@ -18,7 +18,7 @@
 			"path" : "pages/index/section",
 			"style" : 
 			{
-				"navigationBarTitleText" : "天涯神贴(免费分享)",
+				"navigationBarTitleText" : "天涯神贴收录",
 				"enablePullDownRefresh" : true
 			}
 		}

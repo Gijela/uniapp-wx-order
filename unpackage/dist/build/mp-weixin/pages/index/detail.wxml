@@ -1,1 +1,0 @@
-<view class="data-v-728993ed"><block wx:for="{{pdfArr}}" wx:for-item="pdf" wx:for-index="idx" wx:key="idx"><view data-event-opts="{{[['tap',[['openPdf',['$0'],[[['pdfArr','',idx,'url']]]]]]]}}" class="pdfDetail data-v-728993ed" bindtap="__e">{{''+pdf.name+''}}</view></block></view>

@@ -19,6 +19,7 @@
 			}
 		},
 		onLoad() {
+			console.log('xxxx: ', uni.getSystemInfoSync().platform)
 			uni.request({
 			  url: 'https://imgfuse.devin.ren/tianya/config.json',
 			  method: 'GET',

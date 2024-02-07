@@ -24,9 +24,8 @@
 		methods: {
 			openPdf(url) {
 			  const platform = uni.getSystemInfoSync().platform
-			  if (platform === 'ios') {
-				  uni.navigateTo({ url: "/pages/common/webview?webUrl=" + url });
-			  } else {
+			  console.log('凭条：', platform)
+			  if (platform === 'android') {
 				  uni.showLoading({
 					title: '加载中',
 					mask: true,
@@ -46,6 +45,8 @@
 					  uni.hideLoading()
 					}
 				  });
+			  } else {
+				uni.navigateTo({ url: "/pages/common/webview?webUrl=" + url });
 			  }
 			},
 		}

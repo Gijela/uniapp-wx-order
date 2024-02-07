@@ -2,7 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/common/webview",
-    "pages/index/detail"
+    "pages/index/section"
   ],
   "subPackages": [],
   "window": {
