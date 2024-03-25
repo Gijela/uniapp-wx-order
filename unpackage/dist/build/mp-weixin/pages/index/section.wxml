@@ -1,1 +1,0 @@
-<view class="data-v-69f20ac5"><block wx:for="{{pdfList}}" wx:for-item="pdf" wx:for-index="idx" wx:key="idx"><view data-event-opts="{{[['tap',[['openPdf',['$0'],[[['pdfList','',idx,'url']]]]]]]}}" class="{{['data-v-69f20ac5','pdfDemo',[(idx===0)?'bt':'']]}}" bindtap="__e">{{''+pdf.name+''}}</view></block></view>

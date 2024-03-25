@@ -10047,7 +10047,7 @@ exports.getApiKey = getApiKey;
 exports.timestampToDateTime = timestampToDateTime;
 var _regenerator = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/regenerator */ 43));
 var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ 45));
-var One_Api_Base_Url = "https://chat2hub.zeabur.app";
+var One_Api_Base_Url = "https://api.devin.ren";
 exports.One_Api_Base_Url = One_Api_Base_Url;
 var User_Authorization = {
   sVip: "60f7747a9589465c803ecefcbb4bd270"

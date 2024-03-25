@@ -1,4 +1,4 @@
-export const One_Api_Base_Url = "https://chat2hub.zeabur.app";
+export const One_Api_Base_Url = "https://api.devin.ren";
 
 export const User_Authorization = {
   sVip: "60f7747a9589465c803ecefcbb4bd270",
