@@ -24,21 +24,21 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container.data-v-57280228 {
+.container.data-v-2a183b29 {
   width: 100vw;
   height: 100vh;
   background-color: #f8f8f8;
   display: flex;
   flex-direction: column;
 }
-.container .content.data-v-57280228 {
+.container .content.data-v-2a183b29 {
   flex: 1;
   padding: 10px;
   overflow-y: auto;
   box-sizing: border-box;
   border: 2px solid red;
 }
-.container .content .card.data-v-57280228 {
+.container .content .card.data-v-2a183b29 {
   height: 70px;
   border-radius: 10px;
   border: 1px solid #dedede;
@@ -50,15 +50,15 @@
   justify-content: space-between;
   align-items: center;
 }
-.container .content .card .msg.data-v-57280228 {
+.container .content .card .msg.data-v-2a183b29 {
   display: flex;
   flex-direction: column;
 }
-.container .content .card .msg .subTitle.data-v-57280228 {
+.container .content .card .msg .subTitle.data-v-2a183b29 {
   font-size: 14px;
   color: grey;
 }
-.container .content .card .punch-card-btn.data-v-57280228 {
+.container .content .card .punch-card-btn.data-v-2a183b29 {
   width: 70px;
   height: 40px;
   line-height: 40px;
@@ -67,24 +67,30 @@
   background-color: #1d93ab;
   color: white;
 }
-.container .headTitle.data-v-57280228 {
+.container .headTitle.data-v-2a183b29 {
   font-size: 20px;
   background-color: yellow;
   color: red;
 }
-.container .key.data-v-57280228 {
+.container .key.data-v-2a183b29 {
   margin-top: 10px;
   font-size: 17px;
   line-height: 20px;
   word-break: break-all;
 }
-.container .btns.data-v-57280228 {
+.container .key .copyBtn.data-v-2a183b29 {
+  background-color: #1d93ab;
+  color: white;
+  margin-top: 10px;
+  margin-bottom: 40px;
+}
+.container .btns.data-v-2a183b29 {
   display: flex;
   height: 55px;
   line-height: 55px;
   font-size: 18px;
 }
-.container .btns .btn.data-v-57280228 {
+.container .btns .btn.data-v-2a183b29 {
   width: 50%;
   text-align: center;
   background-color: #484545;
