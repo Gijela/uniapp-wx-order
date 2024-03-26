@@ -104,10 +104,13 @@ var render = function () {
   var _c = _vm._self._c || _h
   if (!_vm._isMounted) {
     _vm.e0 = function ($event) {
-      _vm.curPage = "home"
+      _vm.curPage = _vm.routerConfig.homePage
     }
     _vm.e1 = function ($event) {
-      _vm.curPage = "myInfo"
+      _vm.curPage = _vm.routerConfig.pastPage
+    }
+    _vm.e2 = function ($event) {
+      _vm.curPage = _vm.routerConfig.myInfo
     }
   }
 }
@@ -143,7 +146,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(wx) {
+/* WEBPACK VAR INJECTION */(function(wx, uni) {
 
 var _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ 4);
 Object.defineProperty(exports, "__esModule", {
@@ -203,26 +206,82 @@ var _index = __webpack_require__(/*! ../utils/index */ 44);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var PastPage = function PastPage() {
+  __webpack_require__.e(/*! require.ensure | pages/pastPage */ "pages/pastPage").then((function () {
+    return resolve(__webpack_require__(/*! ./pastPage.vue */ 55));
+  }).bind(null, __webpack_require__)).catch(__webpack_require__.oe);
+};
 var _default = {
+  components: {
+    PastPage: PastPage
+  },
   data: function data() {
     return {
       curPage: "home",
-      data: [{
-        title: "聊天训练营 - 预约报名",
-        subTitle: "报名成功可体验 30 分钟"
-      }, {
-        title: "图片训练营 - 预约报名",
-        subTitle: "报名成功可体验一次"
-      }],
+      routerConfig: {
+        homePage: "home",
+        pastPage: "past",
+        myInfo: "myInfo"
+      },
+      data: [],
       ApiKey: "暂无",
       videoAd: null
     };
   },
   onLoad: function onLoad() {
+    this.mockData();
     this.exciteVideoAd();
   },
   methods: {
     copyText: _index.copyText,
+    generateWeChatIDs: function generateWeChatIDs() {
+      var weChatIDs = [];
+      for (var i = 0; i < 30; i++) {
+        var weChatID = Math.random().toString(36).substr(2, 3) + "*****" + Math.random().toString(36).substr(2, 3);
+        weChatIDs.push(weChatID);
+      }
+      return weChatIDs;
+    },
+    mockData: function mockData() {
+      var tempArr = [{
+        title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C 15 \u671F",
+        subTitle: "已结束",
+        key: 15,
+        pastTimeData: this.generateWeChatIDs(),
+        endTime: "2024.3.20"
+      }, {
+        title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C 14 \u671F",
+        subTitle: "已结束",
+        key: 14,
+        pastTimeData: this.generateWeChatIDs(),
+        endTime: "2024.2.20"
+      }, {
+        title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C 13 \u671F",
+        subTitle: "已结束",
+        key: 13,
+        pastTimeData: this.generateWeChatIDs(),
+        endTime: "2024.1.20"
+      }];
+      for (var i = 12; i > 0; i--) {
+        tempArr.push({
+          title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C ".concat(i, " \u671F"),
+          subTitle: "已结束",
+          key: i,
+          pastTimeData: this.generateWeChatIDs(),
+          endTime: "2023.".concat(i, ".20")
+        });
+      }
+      this.data = tempArr;
+    },
     exciteVideoAd: function exciteVideoAd() {
       var _this = this;
       // 在页面 onLoad 回调事件中创建激励视频广告实例
@@ -268,13 +327,8 @@ var _default = {
         }());
       }
     },
-    handleClickPunchBtn: function handleClickPunchBtn(idx) {
+    callExciteAd: function callExciteAd() {
       var _this2 = this;
-      if (idx === 1) {
-        (0, _index.showToast)("暂未开放报名~", false);
-        return;
-      }
-
       // 用户触发广告后，显示激励视频广告
       if (this.videoAd) {
         this.videoAd.show().catch(function () {
@@ -288,11 +342,16 @@ var _default = {
       } else {
         this.ApiKey = "临时钥匙";
       }
+    },
+    jumpPastTimePage: function jumpPastTimePage(item) {
+      uni.navigateTo({
+        url: "/pages/detail?info=".concat(JSON.stringify(item))
+      });
     }
   }
 };
 exports.default = _default;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/wx.js */ 1)["default"]))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/wx.js */ 1)["default"], __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 2)["default"]))
 
 /***/ }),
 

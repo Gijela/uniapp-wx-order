@@ -5,6 +5,12 @@
       "style": {
         "navigationBarTitleText": "Chat2hub"
       }
+    },
+    {
+      "path": "pages/detail",
+      "style": {
+        "navigationBarTitleText": "Chat2hub"
+      }
     }
   ],
   "globalStyle": {

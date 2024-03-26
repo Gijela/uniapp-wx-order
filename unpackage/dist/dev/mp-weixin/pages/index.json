@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "Chat2hub",
-  "usingComponents": {}
+  "usingComponents": {
+    "past-page": "/pages/pastPage"
+  }
 }

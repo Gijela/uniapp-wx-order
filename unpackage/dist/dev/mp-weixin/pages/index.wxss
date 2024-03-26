@@ -34,8 +34,11 @@
 .container .content.data-v-2a183b29 {
   flex: 1;
   padding: 10px;
-  overflow-y: auto;
   box-sizing: border-box;
+  overflow-y: auto;
+}
+.container .content .card-container.data-v-2a183b29 {
+  overflow-y: auto;
 }
 .container .content .card.data-v-2a183b29 {
   height: 70px;
@@ -90,7 +93,7 @@
   font-size: 18px;
 }
 .container .btns .btn.data-v-2a183b29 {
-  width: 50%;
+  flex: 1;
   text-align: center;
   background-color: #484545;
   color: white;

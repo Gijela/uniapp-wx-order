@@ -1,29 +1,37 @@
 <template>
   <view class="container">
-    <!-- banner ad -->
-    <!-- <ad unit-id="adunit-acc844a59d4586eb"></ad> -->
-
     <!-- video ad -->
     <ad unit-id="adunit-0209e9f2255ab890" ad-type="video" ad-theme="white"></ad>
 
     <!-- content -->
     <view class="content">
-      <view v-if="curPage === 'home'">
-        <view v-for="(item, idx) in data" :key="idx" class="card">
+      <view v-if="curPage === 'home'" class="card-container">
+        <!-- 预约报名(含按钮) -->
+        <view class="card">
+          <view class="msg">
+            <view>聊天训练营 - 第 16 期</view>
+            <view class="subTitle">报名成功可体验 30 分钟</view>
+          </view>
+          <view class="punch-card-btn" @click="callExciteAd">
+            {{ ApiKey === "暂无" ? "报名" : "已报名" }}
+          </view>
+        </view>
+
+        <!-- 往期 -->
+        <view
+          v-for="(item, idx) in data"
+          :key="idx"
+          class="card"
+          @click="jumpPastTimePage(item)"
+        >
           <view class="msg">
             <view>{{ item.title }}</view>
             <view class="subTitle">{{ item.subTitle }}</view>
           </view>
-          <view
-            :key="idx"
-            class="punch-card-btn"
-            @click="handleClickPunchBtn(idx)"
-          >
-            {{ ApiKey === "暂无" || idx === 1 ? "报名" : "已报名" }}
-          </view>
         </view>
       </view>
-      <view v-else>
+      <PastPage v-else-if="curPage === 'past'" :info="data"></PastPage>
+      <view v-else-if="curPage === 'myInfo'">
         <view class="headTitle">您获得的身份密码如下：</view>
         <view class="key"
           >聊天训练营 - 入营身份：{{ ApiKey }}
@@ -41,8 +49,9 @@
 
     <!-- bottom btn -->
     <view class="btns">
-      <view class="btn" @click="curPage = 'home'">去报名</view>
-      <view class="btn" @click="curPage = 'myInfo'">我的</view>
+      <view class="btn" @click="curPage = routerConfig.homePage">去报名</view>
+      <view class="btn" @click="curPage = routerConfig.pastPage">查看往期</view>
+      <view class="btn" @click="curPage = routerConfig.myInfo">我的</view>
     </view>
   </view>
 </template>
@@ -50,30 +59,77 @@
 <script>
 import { getApiKey } from "../utils/apiKeyFn";
 import { copyText, showToast } from "../utils/index";
+import PastPage from "./pastPage.vue";
 
 export default {
+  components: {
+    PastPage,
+  },
   data() {
     return {
       curPage: "home",
-      data: [
-        {
-          title: "聊天训练营 - 预约报名",
-          subTitle: "报名成功可体验 30 分钟",
-        },
-        {
-          title: "图片训练营 - 预约报名",
-          subTitle: "报名成功可体验一次",
-        },
-      ],
+      routerConfig: {
+        homePage: "home",
+        pastPage: "past",
+        myInfo: "myInfo",
+      },
+      data: [],
       ApiKey: "暂无",
       videoAd: null,
     };
   },
   onLoad() {
+    this.mockData();
     this.exciteVideoAd();
   },
   methods: {
     copyText,
+    generateWeChatIDs() {
+      let weChatIDs = [];
+      for (let i = 0; i < 30; i++) {
+        let weChatID =
+          Math.random().toString(36).substr(2, 3) +
+          "*****" +
+          Math.random().toString(36).substr(2, 3);
+        weChatIDs.push(weChatID);
+      }
+      return weChatIDs;
+    },
+    mockData() {
+      const tempArr = [
+        {
+          title: `聊天训练营 - 第 15 期`,
+          subTitle: "已结束",
+          key: 15,
+          pastTimeData: this.generateWeChatIDs(),
+          endTime: `2024.3.20`,
+        },
+        {
+          title: `聊天训练营 - 第 14 期`,
+          subTitle: "已结束",
+          key: 14,
+          pastTimeData: this.generateWeChatIDs(),
+          endTime: `2024.2.20`,
+        },
+        {
+          title: `聊天训练营 - 第 13 期`,
+          subTitle: "已结束",
+          key: 13,
+          pastTimeData: this.generateWeChatIDs(),
+          endTime: `2024.1.20`,
+        },
+      ];
+      for (let i = 12; i > 0; i--) {
+        tempArr.push({
+          title: `聊天训练营 - 第 ${i} 期`,
+          subTitle: "已结束",
+          key: i,
+          pastTimeData: this.generateWeChatIDs(),
+          endTime: `2023.${i}.20`,
+        });
+      }
+      this.data = tempArr;
+    },
     exciteVideoAd() {
       // 在页面 onLoad 回调事件中创建激励视频广告实例
       if (wx.createRewardedVideoAd) {
@@ -96,12 +152,7 @@ export default {
         });
       }
     },
-    handleClickPunchBtn(idx) {
-      if (idx === 1) {
-        showToast("暂未开放报名~", false);
-        return;
-      }
-
+    callExciteAd() {
       // 用户触发广告后，显示激励视频广告
       if (this.videoAd) {
         this.videoAd.show().catch(() => {
@@ -116,6 +167,9 @@ export default {
       } else {
         this.ApiKey = "临时钥匙";
       }
+    },
+    jumpPastTimePage(item) {
+      uni.navigateTo({ url: `/pages/detail?info=${JSON.stringify(item)}` });
     },
   },
 };
@@ -133,9 +187,14 @@ export default {
   .content {
     flex: 1;
     padding: 10px;
-    overflow-y: auto;
     box-sizing: border-box;
+    overflow-y: auto;
+
     // border: 2px solid red;
+
+    .card-container {
+      overflow-y: auto;
+    }
 
     .card {
       height: 70px;
@@ -197,7 +256,7 @@ export default {
     font-size: 18px;
 
     .btn {
-      width: 50%;
+      flex: 1;
       text-align: center;
 
       background-color: rgb(72, 69, 69);
