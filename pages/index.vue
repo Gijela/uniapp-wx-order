@@ -1,7 +1,10 @@
 <template>
   <view class="container">
     <!-- banner ad -->
-    <ad unit-id="adunit-acc844a59d4586eb"></ad>
+    <!-- <ad unit-id="adunit-acc844a59d4586eb"></ad> -->
+
+    <!-- video ad -->
+    <ad unit-id="adunit-0209e9f2255ab890" ad-type="video" ad-theme="white"></ad>
 
     <!-- content -->
     <view class="content">
@@ -36,9 +39,6 @@
       </view>
     </view>
 
-    <!-- video ad -->
-    <ad unit-id="adunit-0209e9f2255ab890" ad-type="video" ad-theme="white"></ad>
-
     <!-- bottom btn -->
     <view class="btns">
       <view class="btn" @click="curPage = 'home'">去报名</view>
@@ -48,9 +48,8 @@
 </template>
 
 <script>
-import { callExciteAd, callScreenAd } from "../utils/advertise";
 import { getApiKey } from "../utils/apiKeyFn";
-import { copyText } from "../utils/index";
+import { copyText, showToast } from "../utils/index";
 
 export default {
   data() {
@@ -58,40 +57,64 @@ export default {
       curPage: "home",
       data: [
         {
-          title: "聊天训练营预约报名",
+          title: "聊天训练营 - 预约报名",
           subTitle: "报名成功可体验 30 分钟",
         },
         {
-          title: "图片训练营预约报名",
+          title: "图片训练营 - 预约报名",
           subTitle: "报名成功可体验一次",
         },
       ],
       ApiKey: "暂无",
+      videoAd: null,
     };
   },
   onLoad() {
-    callScreenAd("adunit-fba3ca5266a2bae2");
+    this.exciteVideoAd();
   },
   methods: {
-    callExciteAd,
-    getApiKey,
     copyText,
-    handleReactiveVar(ApiKey) {
-      this.ApiKey = ApiKey;
+    exciteVideoAd() {
+      // 在页面 onLoad 回调事件中创建激励视频广告实例
+      if (wx.createRewardedVideoAd) {
+        this.videoAd = wx.createRewardedVideoAd({
+          adUnitId: "adunit-585a8e725bc2bdf8",
+        });
+        this.videoAd.onLoad(() => {});
+        this.videoAd.onError((err) => {
+          showToast("激励视频广告加载失败", false);
+        });
+        this.videoAd.onClose(async (res) => {
+          if (res && res.isEnded) {
+            // 额外做的操作
+            const ApiKey = await getApiKey();
+            this.ApiKey = ApiKey;
+            showToast("奖励已下发, 请在「我的」页面查收~", true);
+          } else {
+            showToast("未获得奖励, 继续加油~", false);
+          }
+        });
+      }
     },
     handleClickPunchBtn(idx) {
-      if (idx === 0) {
-        this.callExciteAd(
-          `adunit-585a8e725bc2bdf8`,
-          this.getApiKey,
-          this.handleReactiveVar
-        );
-      } else {
-        wx.showToast({
-          title: "暂未开放报名~",
-          icon: "none",
-          duration: 2000, // 提示的延迟时间，单位毫秒
+      if (idx === 1) {
+        showToast("暂未开放报名~", false);
+        return;
+      }
+
+      // 用户触发广告后，显示激励视频广告
+      if (this.videoAd) {
+        this.videoAd.show().catch(() => {
+          // 失败重试
+          this.videoAd
+            .load()
+            .then(() => this.videoAd.show())
+            .catch((err) => {
+              showToast("激励视频 广告显示失败", false);
+            });
         });
+      } else {
+        this.ApiKey = "临时钥匙";
       }
     },
   },
@@ -112,7 +135,7 @@ export default {
     padding: 10px;
     overflow-y: auto;
     box-sizing: border-box;
-    border: 2px solid red;
+    // border: 2px solid red;
 
     .card {
       height: 70px;

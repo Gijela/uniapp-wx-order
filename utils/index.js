@@ -20,3 +20,15 @@ export function copyText(text) {
     },
   });
 }
+
+/*
+ * @msg: string 显示的 toast 文案
+ * @successFlag 是否为成功的 toast
+ */
+export function showToast(msg, successFlag) {
+  wx.showToast({
+    title: msg,
+    icon: successFlag ? "success" : "none",
+    duration: 2000, // 提示的延迟时间，单位毫秒
+  });
+}

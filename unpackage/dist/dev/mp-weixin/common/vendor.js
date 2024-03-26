@@ -9652,144 +9652,6 @@ uni.addInterceptor({
 /* 38 */,
 /* 39 */,
 /* 40 */
-/*!*****************************************************************************!*\
-  !*** /Users/dz0400351/Desktop/github-repo/tianya-uniapp/utils/advertise.js ***!
-  \*****************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(wx) {
-
-var _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ 4);
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.callExciteAd = callExciteAd;
-exports.callScreenAd = callScreenAd;
-var _regenerator = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/regenerator */ 41));
-var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ 43));
-/*
-  在页面中定义激励视频广告
-  @adUnitId: string 激励广告位ID
-  @successCb: 看完视频，下发奖励的接口
-  @setReactiveVar: 更新响应式变量的值
-  return void
- */
-function callExciteAd(adUnitId, successCb, setReactiveVar) {
-  var videoAd = null;
-
-  // 在页面onLoad回调事件中创建激励视频广告实例
-  if (wx.createRewardedVideoAd) {
-    videoAd = wx.createRewardedVideoAd({
-      adUnitId: adUnitId
-    });
-    videoAd.onLoad(function () {});
-    videoAd.onError(function (err) {
-      console.error("激励视频光告加载失败", err);
-    });
-    videoAd.onClose( /*#__PURE__*/function () {
-      var _ref = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee(res) {
-        var ApiKey;
-        return _regenerator.default.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                if (!(res && res.isEnded)) {
-                  _context.next = 9;
-                  break;
-                }
-                console.log("激励正常播放结束，下发奖励");
-
-                // 额外做的操作
-                _context.next = 4;
-                return successCb();
-              case 4:
-                ApiKey = _context.sent;
-                setReactiveVar(ApiKey);
-                wx.showToast({
-                  title: "奖励已下发, 请在「我的」页面查收~",
-                  icon: "success",
-                  duration: 2000 // 提示的延迟时间，单位毫秒
-                });
-                _context.next = 11;
-                break;
-              case 9:
-                console.log("播放中途退出，不下发奖励");
-                wx.showToast({
-                  title: "未获得奖励, 继续加油~",
-                  icon: "none",
-                  duration: 2000 // 提示的延迟时间，单位毫秒
-                });
-              case 11:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee);
-      }));
-      return function (_x) {
-        return _ref.apply(this, arguments);
-      };
-    }());
-  }
-
-  // 用户触发广告后，显示激励视频广告
-  if (videoAd) {
-    videoAd.show().catch(function () {
-      // 失败重试
-      videoAd.load().then(function () {
-        return videoAd.show();
-      }).catch(function (err) {
-        console.error("激励视频 广告显示失败", err);
-      });
-    });
-  }
-}
-
-/*
-  在页面中定义插屏广告  
-  @adUnitId: string 插屏广告位ID
-  return void
- */
-function callScreenAd(adUnitId) {
-  var interstitialAd = null;
-
-  // 在页面onLoad回调事件中创建插屏广告实例
-  if (wx.createInterstitialAd) {
-    interstitialAd = wx.createInterstitialAd({
-      adUnitId: adUnitId
-    });
-    interstitialAd.onLoad(function () {});
-    interstitialAd.onError(function (err) {
-      console.error("插屏广告加载失败", err);
-    });
-    interstitialAd.onClose(function () {});
-  }
-
-  // 在适合的场景显示插屏广告
-  if (interstitialAd) {
-    interstitialAd.show().catch(function (err) {
-      console.error("插屏广告显示失败", err);
-    });
-  }
-}
-
-// request demo
-// export function req_demo() {
-//   uni.request({
-//     url: "https://imgfuse.devin.ren/tianya/config.json",
-//     method: "GET",
-//     data: {},
-//     header: {},
-//     success: (res) => {},
-//     fail: (err) => {},
-//   });
-// }
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/wx.js */ 1)["default"]))
-
-/***/ }),
-/* 41 */
 /*!************************************************************************************************!*\
   !*** ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/@babel/runtime/regenerator/index.js ***!
   \************************************************************************************************/
@@ -9798,11 +9660,11 @@ function callScreenAd(adUnitId) {
 
 // TODO(Babel 8): Remove this file.
 
-var runtime = __webpack_require__(/*! @babel/runtime/helpers/regeneratorRuntime */ 42)();
+var runtime = __webpack_require__(/*! @babel/runtime/helpers/regeneratorRuntime */ 41)();
 module.exports = runtime;
 
 /***/ }),
-/* 42 */
+/* 41 */
 /*!*******************************************************************!*\
   !*** ./node_modules/@babel/runtime/helpers/regeneratorRuntime.js ***!
   \*******************************************************************/
@@ -10123,7 +9985,7 @@ function _regeneratorRuntime() {
 module.exports = _regeneratorRuntime, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ }),
-/* 43 */
+/* 42 */
 /*!*****************************************************************!*\
   !*** ./node_modules/@babel/runtime/helpers/asyncToGenerator.js ***!
   \*****************************************************************/
@@ -10163,7 +10025,7 @@ function _asyncToGenerator(fn) {
 module.exports = _asyncToGenerator, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ }),
-/* 44 */
+/* 43 */
 /*!****************************************************************************!*\
   !*** /Users/dz0400351/Desktop/github-repo/tianya-uniapp/utils/apiKeyFn.js ***!
   \****************************************************************************/
@@ -10180,8 +10042,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.User_Authorization = exports.Two_quarter = exports.One_Api_Base_Url = void 0;
 exports.getApiKey = getApiKey;
 exports.timestampToDateTime = timestampToDateTime;
-var _regenerator = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/regenerator */ 41));
-var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ 43));
+var _regenerator = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/regenerator */ 40));
+var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ 42));
 var One_Api_Base_Url = "https://api.devin.ren";
 exports.One_Api_Base_Url = One_Api_Base_Url;
 var User_Authorization = {
@@ -10309,7 +10171,7 @@ function _getApiKey() {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 2)["default"]))
 
 /***/ }),
-/* 45 */
+/* 44 */
 /*!*************************************************************************!*\
   !*** /Users/dz0400351/Desktop/github-repo/tianya-uniapp/utils/index.js ***!
   \*************************************************************************/
@@ -10323,6 +10185,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.copyText = copyText;
+exports.showToast = showToast;
 /*
  * @text: string 被复制的文本
  */
@@ -10345,6 +10208,18 @@ function copyText(text) {
         duration: 2000 // 提示的延迟时间，单位毫秒
       });
     }
+  });
+}
+
+/*
+ * @msg: string 显示的 toast 文案
+ * @successFlag 是否为成功的 toast
+ */
+function showToast(msg, successFlag) {
+  wx.showToast({
+    title: msg,
+    icon: successFlag ? "success" : "none",
+    duration: 2000 // 提示的延迟时间，单位毫秒
   });
 }
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 2)["default"], __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/wx.js */ 1)["default"]))
