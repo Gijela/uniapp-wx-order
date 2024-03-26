@@ -14,15 +14,9 @@
           <view
             :key="idx"
             class="punch-card-btn"
-            @click="
-              callExciteAd(
-                `adunit-585a8e725bc2bdf8`,
-                getApiKey,
-                handleReactiveVar
-              )
-            "
+            @click="handleClickPunchBtn(idx)"
           >
-            报名
+            {{ ApiKey === "暂无" || idx === 1 ? "报名" : "已报名" }}
           </view>
         </view>
       </view>
@@ -84,6 +78,21 @@ export default {
     copyText,
     handleReactiveVar(ApiKey) {
       this.ApiKey = ApiKey;
+    },
+    handleClickPunchBtn(idx) {
+      if (idx === 0) {
+        this.callExciteAd(
+          `adunit-585a8e725bc2bdf8`,
+          this.getApiKey,
+          this.handleReactiveVar
+        );
+      } else {
+        wx.showToast({
+          title: "暂未开放报名~",
+          icon: "none",
+          duration: 2000, // 提示的延迟时间，单位毫秒
+        });
+      }
     },
   },
 };
