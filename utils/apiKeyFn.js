@@ -4,38 +4,17 @@ export const User_Authorization = {
   sVip: "60f7747a9589465c803ecefcbb4bd270",
 };
 
-export const Two_quarter = {
-  time: 2 * 15 * 60 * 1000, // 一刻钟(15min)
-  msg: "30分钟",
-};
-
-export function timestampToDateTime(timestamp) {
-  const date = new Date(timestamp);
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const seconds = date.getSeconds();
-  // 将年月日时分秒拼接为字符串形式的日期时间
-  const dateTime = `${year}-${month.toString().padStart(2, "0")}-${day
-    .toString()
-    .padStart(2, "0")} ${hours.toString().padStart(2, "0")}:${minutes
-    .toString()
-    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-  return dateTime;
-}
+export const Two_quarter = 35 * 60 * 1000; // 一刻钟(15min)单位是ms, 多加了5分钟
 
 // 生成 ApiKey
 function generateApiKey(nowTimeStamp) {
-  console.log("ggg: ", parseInt((nowTimeStamp + Two_quarter.time) / 1000));
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     uni.request({
       url: `${One_Api_Base_Url}/api/token/`,
       method: "post",
       data: {
         name: String("mini_" + nowTimeStamp), // 当前时间戳 as 令牌名字
-        expired_time: parseInt((nowTimeStamp + Two_quarter.time) / 1000), // 单位是秒
+        expired_time: parseInt((nowTimeStamp + Two_quarter) / 1000), // 单位是秒
         is_edit: false, // 新建 or 编辑, false表示新建固定，即可
         unlimited_quota: true, // 无限额度开关, 固定即可
         remain_quota: 987654, // 额度, 固定即可
@@ -44,20 +23,15 @@ function generateApiKey(nowTimeStamp) {
         Authorization: `Bearer ${User_Authorization.sVip}`,
       },
       success: (res) => {
-        resolve(
-          res?.data?.success ? "success" : "获取入营身份没有成功，请联系客服~"
-        );
-      },
-      fail: (err) => {
-        reject("获取入营身份没有成功，请联系客服~");
+        resolve(res?.data?.success);
       },
     });
   });
 }
 
 // 通过令牌名称查找 ApiKey
-function searchApiKey(ApiKey_Name) {
-  return new Promise((resolve, reject) => {
+export function searchApiKey(ApiKey_Name) {
+  return new Promise((resolve) => {
     uni.request({
       url: `${One_Api_Base_Url}/api/token/search?keyword=${ApiKey_Name}`,
       method: "get",
@@ -66,32 +40,87 @@ function searchApiKey(ApiKey_Name) {
       },
       success: ({ data: response }) => {
         if (response.success && response.data.length > 0) {
-          const ApiKey = "sk-" + response.data[0].key;
-          resolve(ApiKey);
-        } else {
-          resolve("获取入营身份没有成功，请联系客服~");
+          const { key, name, expired_time } = response.data[0];
+          const OneApi = {
+            ApiKey_Name: name,
+            ApiKey: "sk-" + key,
+            Expire_Time: expired_time,
+          };
+          wx.setStorageSync("oneApi", OneApi); // 项目中使用到的三个属性
+          wx.setStorageSync("oneApi_RowData", response.data[0]); // 接口返回的令牌所有属性，更新令牌需要用到
+          resolve(OneApi);
         }
-      },
-      fail: (err) => {
-        reject("获取入营身份没有成功，请联系客服~");
       },
     });
   });
 }
 
 // 入口文件
-export async function getApiKey() {
-  // 0. 时间戳作为令牌名字，保证令牌唯一性
+/*
+ * return { ApiKey_Name: string, ApiKey: string, Expire_Time: number单位是秒 }
+ */
+export async function generateToken() {
+  // 1. 时间戳作为令牌名字，保证令牌唯一性
   const nowTimeStamp = new Date().getTime();
 
-  // 1. 生成 ApiKey. 这个接口返回体是{ message: '', success: true }，拿不到生成的ApiKey
-  const resultString = await generateApiKey(nowTimeStamp);
+  // 2. 生成 ApiKey. 这个版本接口返回体是{ message: '', success: true }，拿不到生成的ApiKey
+  const generateSuccessFlag = await generateApiKey(nowTimeStamp);
 
-  // 2. 通过令牌查找 ApiKey
-  const ApiKey =
-    resultString === "success"
-      ? await searchApiKey("mini_" + nowTimeStamp)
-      : resultString;
+  let targetOneApi = {};
+  if (generateSuccessFlag) {
+    targetOneApi = await searchApiKey("mini_" + nowTimeStamp);
+  }
 
-  return ApiKey;
+  return targetOneApi;
+}
+
+// 延迟过期时间
+function updateExpiredTime(tokenRowData) {
+  return new Promise((resolve) => {
+    uni.request({
+      url: `${One_Api_Base_Url}/api/token/`,
+      method: "put",
+      data: {
+        ...tokenRowData,
+        is_edit: true,
+      },
+      header: {
+        Authorization: `Bearer ${User_Authorization.sVip}`,
+      },
+      success: ({ data: response }) => {
+        if (response.success && response.data) {
+          const { key, name, expired_time } = response.data;
+          const OneApi = {
+            ApiKey_Name: name,
+            ApiKey: "sk-" + key,
+            Expire_Time: expired_time,
+          };
+          wx.setStorageSync("oneApi", OneApi); // 项目中使用到的三个属性
+          wx.setStorageSync("oneApi_RowData", response.data); // 接口返回的令牌所有属性，更新令牌需要用到
+          resolve(OneApi);
+        }
+      },
+    });
+  });
+}
+
+/*
+ * @OneApi: { ApiKey_Name: string, ApiKey: string, Expire_Time: number单位是秒 }
+ * return 同@OneApi
+ */
+export async function updateToken() {
+  const tokenRowData = wx.getStorageSync("oneApi_RowData"),
+    curTimeStamp = new Date().getTime();
+  // 过期时间逻辑：未到过期time就直接加上延长时间，已过期就基于当前时间再加上延长的时间
+  if (tokenRowData.expired_time >= curTimeStamp / 1000) {
+    tokenRowData.expired_time = parseInt(
+      tokenRowData.expired_time + Two_quarter / 1000
+    );
+  } else {
+    tokenRowData.expired_time = parseInt((curTimeStamp + Two_quarter) / 1000);
+  }
+
+  const targetOneApi = await updateExpiredTime(tokenRowData);
+
+  return targetOneApi;
 }

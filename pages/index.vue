@@ -10,10 +10,16 @@
         <view class="card">
           <view class="msg">
             <view>聊天训练营 - 第 16 期</view>
-            <view class="subTitle">报名成功可体验 30 分钟</view>
+            <view class="subTitle">
+              {{
+                !OneApi.ApiKey
+                  ? "报名成功可体验 30 分钟"
+                  : "加时成功可增加 30 分钟"
+              }}
+            </view>
           </view>
           <view class="punch-card-btn" @click="callExciteAd">
-            {{ ApiKey === "暂无" ? "报名" : "已报名" }}
+            {{ !OneApi.ApiKey ? "报名" : "加时" }}
           </view>
         </view>
 
@@ -32,18 +38,33 @@
       </view>
       <PastPage v-else-if="curPage === 'past'" :info="data"></PastPage>
       <view v-else-if="curPage === 'myInfo'">
-        <view class="headTitle">您获得的身份密码如下：</view>
-        <view class="key"
-          >聊天训练营 - 入营身份：{{ ApiKey }}
-          <button
-            v-if="ApiKey !== '暂无'"
-            @click="copyText(ApiKey)"
-            class="copyBtn"
-          >
-            复制
-          </button>
+        <view
+          v-if="!OneApi.ApiKey && !OneApi.Expire_Time"
+          class="no-have-apiKey"
+        >
+          暂无身份，快去报名吧~
         </view>
-        <view class="key">图片训练营 - 入营身份：暂未开放</view>
+        <view v-else>
+          <view class="token-property">身份名称：{{ OneApi.ApiKey_Name }}</view>
+          <view class="token-property"
+            >过期时间：{{ formatTimestamp(OneApi.Expire_Time * 1000) }}</view
+          >
+          <view class="token-property"
+            >入营身份密码：<text class="token-ApiKey-value">{{
+              OneApi.ApiKey
+            }}</text>
+          </view>
+          <view class="btn-container">
+            <button class="copyBtn" @click="copyText(OneApi.ApiKey)">
+              复制密码
+            </button>
+            <button class="updateBtn" @click="callExciteAd">增加 30 min</button>
+          </view>
+
+          <view class="desc-text">
+            加时规则：取当前时间与过期时间中的最大值，增加30分钟作为新的过期时间
+          </view>
+        </view>
       </view>
     </view>
 
@@ -57,8 +78,9 @@
 </template>
 
 <script>
-import { getApiKey } from "../utils/apiKeyFn";
-import { copyText, showToast } from "../utils/index";
+import { generateToken, updateToken, searchApiKey } from "../utils/apiKeyFn";
+import { copyText, showToast, formatTimestamp } from "../utils/index";
+import { mockData } from "../service/config";
 import PastPage from "./pastPage.vue";
 
 export default {
@@ -74,63 +96,49 @@ export default {
         myInfo: "myInfo",
       },
       data: [],
-      ApiKey: "暂无",
       videoAd: null,
+      OneApi: {
+        ApiKey_Name: "",
+        ApiKey: "",
+        Expire_Time: 0,
+      },
     };
   },
-  onLoad() {
-    this.mockData();
-    this.exciteVideoAd();
+  async onLoad() {
+    // mock
+    // const res1 = await this.generateToken();
+    // console.log("🚀 ~ onLoad ~  this.generateToken:", res1);
+    // await this.searchApiKey("mini_1711525349882");
+    // const res2 = await this.updateToken();
+    // console.log("🚀 ~ onLoad - updateToken ~ res2:", res2);
+
+    // wx.removeStorageSync("oneApi");
+    // wx.clearStorageSync();
+    // console.log("all: ", wx.getStorageInfoSync());
+
+    // console.log("fore: ", wx.getStorageInfoSync());
+    // wx.clearStorageSync();
+    // console.log("back: ", wx.getStorageInfoSync());
+    // wx.setStorageSync("oneApi", {
+    //   ApiKey_Name: "test",
+    //   ApiKey: "sk-dhapsdhasndpqwjupoqwfopqenvo[nqo[nv[qobenvq[ovbnq[eob]]]]]",
+    //   Expire_Time: 666,
+    // });
+
+    // real
+    this.data = this.mockData();
+    const result = wx.getStorageSync("oneApi");
+    if (result && typeof result === "object") this.OneApi = result;
+    this.initExciteVideoAd();
   },
   methods: {
+    searchApiKey,
+    updateToken,
+    generateToken,
+    mockData,
     copyText,
-    generateWeChatIDs() {
-      let weChatIDs = [];
-      for (let i = 0; i < 30; i++) {
-        let weChatID =
-          Math.random().toString(36).substr(2, 3) +
-          "*****" +
-          Math.random().toString(36).substr(2, 3);
-        weChatIDs.push(weChatID);
-      }
-      return weChatIDs;
-    },
-    mockData() {
-      const tempArr = [
-        {
-          title: `聊天训练营 - 第 15 期`,
-          subTitle: "已结束",
-          key: 15,
-          pastTimeData: this.generateWeChatIDs(),
-          endTime: `2024.3.20`,
-        },
-        {
-          title: `聊天训练营 - 第 14 期`,
-          subTitle: "已结束",
-          key: 14,
-          pastTimeData: this.generateWeChatIDs(),
-          endTime: `2024.2.20`,
-        },
-        {
-          title: `聊天训练营 - 第 13 期`,
-          subTitle: "已结束",
-          key: 13,
-          pastTimeData: this.generateWeChatIDs(),
-          endTime: `2024.1.20`,
-        },
-      ];
-      for (let i = 12; i > 0; i--) {
-        tempArr.push({
-          title: `聊天训练营 - 第 ${i} 期`,
-          subTitle: "已结束",
-          key: i,
-          pastTimeData: this.generateWeChatIDs(),
-          endTime: `2023.${i}.20`,
-        });
-      }
-      this.data = tempArr;
-    },
-    exciteVideoAd() {
+    formatTimestamp,
+    initExciteVideoAd() {
       // 在页面 onLoad 回调事件中创建激励视频广告实例
       if (wx.createRewardedVideoAd) {
         this.videoAd = wx.createRewardedVideoAd({
@@ -142,10 +150,14 @@ export default {
         });
         this.videoAd.onClose(async (res) => {
           if (res && res.isEnded) {
-            // 额外做的操作
-            const ApiKey = await getApiKey();
-            this.ApiKey = ApiKey;
-            showToast("奖励已下发, 请在「我的」页面查收~", true);
+            // 额外做的操作: 新建令牌 or 更新令牌
+            if (!this.OneApi.ApiKey && !this.OneApi.ApiKey_Name) {
+              this.OneApi = await generateToken();
+              showToast("奖励已下发, 请在「我的」页面查收~", true);
+            } else {
+              this.OneApi = await updateToken();
+              showToast("已为您更新时间", true);
+            }
           } else {
             showToast("未获得奖励, 继续加油~", false);
           }
@@ -153,20 +165,21 @@ export default {
       }
     },
     callExciteAd() {
-      // 用户触发广告后，显示激励视频广告
-      if (this.videoAd) {
-        this.videoAd.show().catch(() => {
-          // 失败重试
-          this.videoAd
-            .load()
-            .then(() => this.videoAd.show())
-            .catch((err) => {
-              showToast("激励视频 广告显示失败", false);
-            });
-        });
-      } else {
-        this.ApiKey = "临时钥匙";
+      if (!this.videoAd) {
+        showToast("激励视频显示失败", false);
+        return;
       }
+      console.log("触发调用激励视频广告~~");
+      // 用户触发广告后，显示激励视频广告
+      this.videoAd.show().catch(() => {
+        // 失败重试
+        this.videoAd
+          .load()
+          .then(() => this.videoAd.show())
+          .catch((err) => {
+            showToast("激励视频显示失败，请联系客服", false);
+          });
+      });
     },
     jumpPastTimePage(item) {
       uni.navigateTo({ url: `/pages/detail?info=${JSON.stringify(item)}` });
@@ -189,8 +202,6 @@ export default {
     padding: 10px;
     box-sizing: border-box;
     overflow-y: auto;
-
-    // border: 2px solid red;
 
     .card-container {
       overflow-y: auto;
@@ -230,23 +241,40 @@ export default {
         color: white;
       }
     }
-  }
-  .headTitle {
-    font-size: 20px;
-    background-color: yellow;
-    color: red;
-  }
-  .key {
-    margin-top: 10px;
-    font-size: 17px;
-    line-height: 20px;
-    word-break: break-all;
 
-    .copyBtn {
-      background-color: rgb(29, 147, 171);
-      color: white;
+    .no-have-apiKey {
+      margin-top: 50px;
+      font-size: 20px;
+      text-align: center;
+    }
+    .token-property {
       margin-top: 10px;
-      margin-bottom: 40px;
+      font-size: 17px;
+      line-height: 17px;
+    }
+    .token-ApiKey-value {
+      word-break: break-all;
+      color: #f86;
+      font-size: 20px;
+      height: 20px;
+      line-height: 20px;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: space-evenly;
+      margin: 20px 0;
+
+      .copyBtn,
+      .updateBtn {
+        background-color: rgb(29, 147, 171);
+        color: white;
+        width: 40%;
+      }
+    }
+    .desc-text {
+      color: rgb(174, 181, 188);
+      font-size: 14px;
     }
   }
   .btns {

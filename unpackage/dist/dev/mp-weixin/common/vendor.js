@@ -10033,53 +10033,40 @@ module.exports = _asyncToGenerator, module.exports.__esModule = true, module.exp
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {
+/* WEBPACK VAR INJECTION */(function(uni, wx) {
 
 var _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ 4);
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.User_Authorization = exports.Two_quarter = exports.One_Api_Base_Url = void 0;
-exports.getApiKey = getApiKey;
-exports.timestampToDateTime = timestampToDateTime;
+exports.generateToken = generateToken;
+exports.searchApiKey = searchApiKey;
+exports.updateToken = updateToken;
 var _regenerator = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/regenerator */ 40));
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/defineProperty */ 11));
 var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ 42));
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { (0, _defineProperty2.default)(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 var One_Api_Base_Url = "https://api.devin.ren";
 exports.One_Api_Base_Url = One_Api_Base_Url;
 var User_Authorization = {
   sVip: "60f7747a9589465c803ecefcbb4bd270"
 };
 exports.User_Authorization = User_Authorization;
-var Two_quarter = {
-  time: 2 * 15 * 60 * 1000,
-  // 一刻钟(15min)
-  msg: "30分钟"
-};
-exports.Two_quarter = Two_quarter;
-function timestampToDateTime(timestamp) {
-  var date = new Date(timestamp);
-  var year = date.getFullYear();
-  var month = date.getMonth() + 1;
-  var day = date.getDate();
-  var hours = date.getHours();
-  var minutes = date.getMinutes();
-  var seconds = date.getSeconds();
-  // 将年月日时分秒拼接为字符串形式的日期时间
-  var dateTime = "".concat(year, "-").concat(month.toString().padStart(2, "0"), "-").concat(day.toString().padStart(2, "0"), " ").concat(hours.toString().padStart(2, "0"), ":").concat(minutes.toString().padStart(2, "0"), ":").concat(seconds.toString().padStart(2, "0"));
-  return dateTime;
-}
+var Two_quarter = 35 * 60 * 1000; // 一刻钟(15min)单位是ms, 多加了5分钟
 
 // 生成 ApiKey
+exports.Two_quarter = Two_quarter;
 function generateApiKey(nowTimeStamp) {
-  console.log("ggg: ", parseInt((nowTimeStamp + Two_quarter.time) / 1000));
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     uni.request({
       url: "".concat(One_Api_Base_Url, "/api/token/"),
       method: "post",
       data: {
         name: String("mini_" + nowTimeStamp),
         // 当前时间戳 as 令牌名字
-        expired_time: parseInt((nowTimeStamp + Two_quarter.time) / 1000),
+        expired_time: parseInt((nowTimeStamp + Two_quarter) / 1000),
         // 单位是秒
         is_edit: false,
         // 新建 or 编辑, false表示新建固定，即可
@@ -10093,10 +10080,7 @@ function generateApiKey(nowTimeStamp) {
       },
       success: function success(res) {
         var _res$data;
-        resolve(res !== null && res !== void 0 && (_res$data = res.data) !== null && _res$data !== void 0 && _res$data.success ? "success" : "获取入营身份没有成功，请联系客服~");
-      },
-      fail: function fail(err) {
-        reject("获取入营身份没有成功，请联系客服~");
+        resolve(res === null || res === void 0 ? void 0 : (_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data.success);
       }
     });
   });
@@ -10104,7 +10088,7 @@ function generateApiKey(nowTimeStamp) {
 
 // 通过令牌名称查找 ApiKey
 function searchApiKey(ApiKey_Name) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     uni.request({
       url: "".concat(One_Api_Base_Url, "/api/token/search?keyword=").concat(ApiKey_Name),
       method: "get",
@@ -10114,61 +10098,131 @@ function searchApiKey(ApiKey_Name) {
       success: function success(_ref) {
         var response = _ref.data;
         if (response.success && response.data.length > 0) {
-          var ApiKey = "sk-" + response.data[0].key;
-          resolve(ApiKey);
-        } else {
-          resolve("获取入营身份没有成功，请联系客服~");
+          var _response$data$ = response.data[0],
+            key = _response$data$.key,
+            name = _response$data$.name,
+            expired_time = _response$data$.expired_time;
+          var OneApi = {
+            ApiKey_Name: name,
+            ApiKey: "sk-" + key,
+            Expire_Time: expired_time
+          };
+          wx.setStorageSync("oneApi", OneApi); // 项目中使用到的三个属性
+          wx.setStorageSync("oneApi_RowData", response.data[0]); // 接口返回的令牌所有属性，更新令牌需要用到
+          resolve(OneApi);
         }
-      },
-      fail: function fail(err) {
-        reject("获取入营身份没有成功，请联系客服~");
       }
     });
   });
 }
 
 // 入口文件
-function getApiKey() {
-  return _getApiKey.apply(this, arguments);
-}
-function _getApiKey() {
-  _getApiKey = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee() {
-    var nowTimeStamp, resultString, ApiKey;
+/*
+ * return { ApiKey_Name: string, ApiKey: string, Expire_Time: number单位是秒 }
+ */
+function generateToken() {
+  return _generateToken.apply(this, arguments);
+} // 延迟过期时间
+function _generateToken() {
+  _generateToken = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee() {
+    var nowTimeStamp, generateSuccessFlag, targetOneApi;
     return _regenerator.default.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            // 0. 时间戳作为令牌名字，保证令牌唯一性
-            nowTimeStamp = new Date().getTime(); // 1. 生成 ApiKey. 这个接口返回体是{ message: '', success: true }，拿不到生成的ApiKey
+            // 1. 时间戳作为令牌名字，保证令牌唯一性
+            nowTimeStamp = new Date().getTime(); // 2. 生成 ApiKey. 这个版本接口返回体是{ message: '', success: true }，拿不到生成的ApiKey
             _context.next = 3;
             return generateApiKey(nowTimeStamp);
           case 3:
-            resultString = _context.sent;
-            if (!(resultString === "success")) {
-              _context.next = 10;
+            generateSuccessFlag = _context.sent;
+            targetOneApi = {};
+            if (!generateSuccessFlag) {
+              _context.next = 9;
               break;
             }
-            _context.next = 7;
+            _context.next = 8;
             return searchApiKey("mini_" + nowTimeStamp);
-          case 7:
-            _context.t0 = _context.sent;
-            _context.next = 11;
-            break;
+          case 8:
+            targetOneApi = _context.sent;
+          case 9:
+            return _context.abrupt("return", targetOneApi);
           case 10:
-            _context.t0 = resultString;
-          case 11:
-            ApiKey = _context.t0;
-            return _context.abrupt("return", ApiKey);
-          case 13:
           case "end":
             return _context.stop();
         }
       }
     }, _callee);
   }));
-  return _getApiKey.apply(this, arguments);
+  return _generateToken.apply(this, arguments);
 }
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 2)["default"]))
+function updateExpiredTime(tokenRowData) {
+  return new Promise(function (resolve) {
+    uni.request({
+      url: "".concat(One_Api_Base_Url, "/api/token/"),
+      method: "put",
+      data: _objectSpread(_objectSpread({}, tokenRowData), {}, {
+        is_edit: true
+      }),
+      header: {
+        Authorization: "Bearer ".concat(User_Authorization.sVip)
+      },
+      success: function success(_ref2) {
+        var response = _ref2.data;
+        if (response.success && response.data) {
+          var _response$data = response.data,
+            key = _response$data.key,
+            name = _response$data.name,
+            expired_time = _response$data.expired_time;
+          var OneApi = {
+            ApiKey_Name: name,
+            ApiKey: "sk-" + key,
+            Expire_Time: expired_time
+          };
+          wx.setStorageSync("oneApi", OneApi); // 项目中使用到的三个属性
+          wx.setStorageSync("oneApi_RowData", response.data); // 接口返回的令牌所有属性，更新令牌需要用到
+          resolve(OneApi);
+        }
+      }
+    });
+  });
+}
+
+/*
+ * @OneApi: { ApiKey_Name: string, ApiKey: string, Expire_Time: number单位是秒 }
+ * return 同@OneApi
+ */
+function updateToken() {
+  return _updateToken.apply(this, arguments);
+}
+function _updateToken() {
+  _updateToken = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee2() {
+    var tokenRowData, curTimeStamp, targetOneApi;
+    return _regenerator.default.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            tokenRowData = wx.getStorageSync("oneApi_RowData"), curTimeStamp = new Date().getTime(); // 过期时间逻辑：未到过期time就直接加上延长时间，已过期就基于当前时间再加上延长的时间
+            if (tokenRowData.expired_time >= curTimeStamp / 1000) {
+              tokenRowData.expired_time = parseInt(tokenRowData.expired_time + Two_quarter / 1000);
+            } else {
+              tokenRowData.expired_time = parseInt((curTimeStamp + Two_quarter) / 1000);
+            }
+            _context2.next = 4;
+            return updateExpiredTime(tokenRowData);
+          case 4:
+            targetOneApi = _context2.sent;
+            return _context2.abrupt("return", targetOneApi);
+          case 6:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2);
+  }));
+  return _updateToken.apply(this, arguments);
+}
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 2)["default"], __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/wx.js */ 1)["default"]))
 
 /***/ }),
 /* 44 */
@@ -10185,6 +10239,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.copyText = copyText;
+exports.formatTimestamp = formatTimestamp;
 exports.showToast = showToast;
 /*
  * @text: string 被复制的文本
@@ -10195,7 +10250,7 @@ function copyText(text) {
     // 需要复制的文本内容
     success: function success() {
       wx.showToast({
-        title: "复制成功~",
+        title: "复制成功",
         icon: "success",
         duration: 2000 // 提示的延迟时间，单位毫秒
       });
@@ -10203,7 +10258,7 @@ function copyText(text) {
 
     fail: function fail() {
       wx.showToast({
-        title: "复制失败~",
+        title: "复制失败",
         icon: "none",
         duration: 2000 // 提示的延迟时间，单位毫秒
       });
@@ -10222,7 +10277,106 @@ function showToast(msg, successFlag) {
     duration: 2000 // 提示的延迟时间，单位毫秒
   });
 }
+
+/*
+ * @timestamp 时间戳
+ * return 年-月-日 时:分:秒
+ */
+function formatTimestamp(timestamp) {
+  var date = new Date(timestamp),
+    year = date.getFullYear();
+  var month = date.getMonth() + 1; // 获取当前月份(0-11,0代表1月)
+  month = month < 10 ? "0" + month : month; // 补零
+  var day = date.getDate(); // 获取当前日(1-31)
+  day = day < 10 ? "0" + day : day; // 补零
+  var hour = date.getHours(); // 获取当前小时数(0-23)
+  hour = hour < 10 ? "0" + hour : hour; // 补零
+  var minute = date.getMinutes(); // 获取当前分钟数(0-59)
+  minute = minute < 10 ? "0" + minute : minute; // 补零
+  var second = date.getSeconds(); // 获取当前秒数(0-59)
+  second = second < 10 ? "0" + second : second; // 补零
+  return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+}
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 2)["default"], __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/wx.js */ 1)["default"]))
+
+/***/ }),
+/* 45 */,
+/* 46 */,
+/* 47 */,
+/* 48 */,
+/* 49 */,
+/* 50 */,
+/* 51 */,
+/* 52 */,
+/* 53 */,
+/* 54 */,
+/* 55 */,
+/* 56 */,
+/* 57 */,
+/* 58 */,
+/* 59 */,
+/* 60 */,
+/* 61 */,
+/* 62 */,
+/* 63 */,
+/* 64 */,
+/* 65 */,
+/* 66 */
+/*!****************************************************************************!*\
+  !*** /Users/dz0400351/Desktop/github-repo/tianya-uniapp/service/config.js ***!
+  \****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.mockData = mockData;
+// 生成微信Id
+function generateWeChatIDs() {
+  var weChatIDs = [];
+  for (var i = 0; i < 30; i++) {
+    var weChatID = Math.random().toString(36).substr(2, 3) + "*****" + Math.random().toString(36).substr(2, 3);
+    weChatIDs.push(weChatID);
+  }
+  return weChatIDs;
+}
+
+// mock 数据
+function mockData() {
+  var arr = [{
+    title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C 15 \u671F",
+    subTitle: "已结束",
+    key: 15,
+    pastTimeData: generateWeChatIDs(),
+    endTime: "2024.3.20"
+  }, {
+    title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C 14 \u671F",
+    subTitle: "已结束",
+    key: 14,
+    pastTimeData: generateWeChatIDs(),
+    endTime: "2024.2.20"
+  }, {
+    title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C 13 \u671F",
+    subTitle: "已结束",
+    key: 13,
+    pastTimeData: generateWeChatIDs(),
+    endTime: "2024.1.20"
+  }];
+  for (var i = 12; i > 0; i--) {
+    arr.push({
+      title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C ".concat(i, " \u671F"),
+      subTitle: "已结束",
+      key: i,
+      pastTimeData: generateWeChatIDs(),
+      endTime: "2023.".concat(i, ".20")
+    });
+  }
+  return arr;
+}
 
 /***/ })
 ]]);

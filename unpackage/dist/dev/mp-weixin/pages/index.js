@@ -102,6 +102,13 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
+  var m0 =
+    !(_vm.curPage === "home") &&
+    !(_vm.curPage === "past") &&
+    _vm.curPage === "myInfo" &&
+    !(!_vm.OneApi.ApiKey && !_vm.OneApi.Expire_Time)
+      ? _vm.formatTimestamp(_vm.OneApi.Expire_Time * 1000)
+      : null
   if (!_vm._isMounted) {
     _vm.e0 = function ($event) {
       _vm.curPage = _vm.routerConfig.homePage
@@ -113,6 +120,14 @@ var render = function () {
       _vm.curPage = _vm.routerConfig.myInfo
     }
   }
+  _vm.$mp.data = Object.assign(
+    {},
+    {
+      $root: {
+        m0: m0,
+      },
+    }
+  )
 }
 var recyclableRender = false
 var staticRenderFns = []
@@ -154,9 +169,32 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _regenerator = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/regenerator */ 40));
+var _typeof2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/typeof */ 13));
 var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ 42));
 var _apiKeyFn = __webpack_require__(/*! ../utils/apiKeyFn */ 43);
 var _index = __webpack_require__(/*! ../utils/index */ 44);
+var _config = __webpack_require__(/*! ../service/config */ 66);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -233,57 +271,64 @@ var _default = {
         myInfo: "myInfo"
       },
       data: [],
-      ApiKey: "暂无",
-      videoAd: null
+      videoAd: null,
+      OneApi: {
+        ApiKey_Name: "",
+        ApiKey: "",
+        Expire_Time: 0
+      }
     };
   },
   onLoad: function onLoad() {
-    this.mockData();
-    this.exciteVideoAd();
+    var _this = this;
+    return (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee() {
+      var result;
+      return _regenerator.default.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              // mock
+              // const res1 = await this.generateToken();
+              // console.log("🚀 ~ onLoad ~  this.generateToken:", res1);
+              // await this.searchApiKey("mini_1711525349882");
+              // const res2 = await this.updateToken();
+              // console.log("🚀 ~ onLoad - updateToken ~ res2:", res2);
+
+              // wx.removeStorageSync("oneApi");
+              // wx.clearStorageSync();
+              // console.log("all: ", wx.getStorageInfoSync());
+
+              // console.log("fore: ", wx.getStorageInfoSync());
+              // wx.clearStorageSync();
+              // console.log("back: ", wx.getStorageInfoSync());
+              // wx.setStorageSync("oneApi", {
+              //   ApiKey_Name: "test",
+              //   ApiKey: "sk-dhapsdhasndpqwjupoqwfopqenvo[nqo[nv[qobenvq[ovbnq[eob]]]]]",
+              //   Expire_Time: 666,
+              // });
+
+              // real
+              _this.data = _this.mockData();
+              result = wx.getStorageSync("oneApi");
+              if (result && (0, _typeof2.default)(result) === "object") _this.OneApi = result;
+              _this.initExciteVideoAd();
+            case 4:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }))();
   },
   methods: {
+    searchApiKey: _apiKeyFn.searchApiKey,
+    updateToken: _apiKeyFn.updateToken,
+    generateToken: _apiKeyFn.generateToken,
+    mockData: _config.mockData,
     copyText: _index.copyText,
-    generateWeChatIDs: function generateWeChatIDs() {
-      var weChatIDs = [];
-      for (var i = 0; i < 30; i++) {
-        var weChatID = Math.random().toString(36).substr(2, 3) + "*****" + Math.random().toString(36).substr(2, 3);
-        weChatIDs.push(weChatID);
-      }
-      return weChatIDs;
-    },
-    mockData: function mockData() {
-      var tempArr = [{
-        title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C 15 \u671F",
-        subTitle: "已结束",
-        key: 15,
-        pastTimeData: this.generateWeChatIDs(),
-        endTime: "2024.3.20"
-      }, {
-        title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C 14 \u671F",
-        subTitle: "已结束",
-        key: 14,
-        pastTimeData: this.generateWeChatIDs(),
-        endTime: "2024.2.20"
-      }, {
-        title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C 13 \u671F",
-        subTitle: "已结束",
-        key: 13,
-        pastTimeData: this.generateWeChatIDs(),
-        endTime: "2024.1.20"
-      }];
-      for (var i = 12; i > 0; i--) {
-        tempArr.push({
-          title: "\u804A\u5929\u8BAD\u7EC3\u8425 - \u7B2C ".concat(i, " \u671F"),
-          subTitle: "已结束",
-          key: i,
-          pastTimeData: this.generateWeChatIDs(),
-          endTime: "2023.".concat(i, ".20")
-        });
-      }
-      this.data = tempArr;
-    },
-    exciteVideoAd: function exciteVideoAd() {
-      var _this = this;
+    formatTimestamp: _index.formatTimestamp,
+    initExciteVideoAd: function initExciteVideoAd() {
+      var _this2 = this;
       // 在页面 onLoad 回调事件中创建激励视频广告实例
       if (wx.createRewardedVideoAd) {
         this.videoAd = wx.createRewardedVideoAd({
@@ -294,32 +339,43 @@ var _default = {
           (0, _index.showToast)("激励视频广告加载失败", false);
         });
         this.videoAd.onClose( /*#__PURE__*/function () {
-          var _ref = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee(res) {
-            var ApiKey;
-            return _regenerator.default.wrap(function _callee$(_context) {
+          var _ref = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee2(res) {
+            return _regenerator.default.wrap(function _callee2$(_context2) {
               while (1) {
-                switch (_context.prev = _context.next) {
+                switch (_context2.prev = _context2.next) {
                   case 0:
                     if (!(res && res.isEnded)) {
-                      _context.next = 8;
+                      _context2.next = 14;
                       break;
                     }
-                    _context.next = 3;
-                    return (0, _apiKeyFn.getApiKey)();
-                  case 3:
-                    ApiKey = _context.sent;
-                    _this.ApiKey = ApiKey;
+                    if (!(!_this2.OneApi.ApiKey && !_this2.OneApi.ApiKey_Name)) {
+                      _context2.next = 8;
+                      break;
+                    }
+                    _context2.next = 4;
+                    return (0, _apiKeyFn.generateToken)();
+                  case 4:
+                    _this2.OneApi = _context2.sent;
                     (0, _index.showToast)("奖励已下发, 请在「我的」页面查收~", true);
-                    _context.next = 9;
+                    _context2.next = 12;
                     break;
                   case 8:
+                    _context2.next = 10;
+                    return (0, _apiKeyFn.updateToken)();
+                  case 10:
+                    _this2.OneApi = _context2.sent;
+                    (0, _index.showToast)("已为您更新时间", true);
+                  case 12:
+                    _context2.next = 15;
+                    break;
+                  case 14:
                     (0, _index.showToast)("未获得奖励, 继续加油~", false);
-                  case 9:
+                  case 15:
                   case "end":
-                    return _context.stop();
+                    return _context2.stop();
                 }
               }
-            }, _callee);
+            }, _callee2);
           }));
           return function (_x) {
             return _ref.apply(this, arguments);
@@ -328,20 +384,21 @@ var _default = {
       }
     },
     callExciteAd: function callExciteAd() {
-      var _this2 = this;
-      // 用户触发广告后，显示激励视频广告
-      if (this.videoAd) {
-        this.videoAd.show().catch(function () {
-          // 失败重试
-          _this2.videoAd.load().then(function () {
-            return _this2.videoAd.show();
-          }).catch(function (err) {
-            (0, _index.showToast)("激励视频 广告显示失败", false);
-          });
-        });
-      } else {
-        this.ApiKey = "临时钥匙";
+      var _this3 = this;
+      if (!this.videoAd) {
+        (0, _index.showToast)("激励视频显示失败", false);
+        return;
       }
+      console.log("触发调用激励视频广告~~");
+      // 用户触发广告后，显示激励视频广告
+      this.videoAd.show().catch(function () {
+        // 失败重试
+        _this3.videoAd.load().then(function () {
+          return _this3.videoAd.show();
+        }).catch(function (err) {
+          (0, _index.showToast)("激励视频 广告显示失败", false);
+        });
+      });
     },
     jumpPastTimePage: function jumpPastTimePage(item) {
       uni.navigateTo({

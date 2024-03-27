@@ -69,22 +69,37 @@
   background-color: #1d93ab;
   color: white;
 }
-.container .headTitle.data-v-2a183b29 {
+.container .content .no-have-apiKey.data-v-2a183b29 {
+  margin-top: 50px;
   font-size: 20px;
-  background-color: yellow;
-  color: red;
+  text-align: center;
 }
-.container .key.data-v-2a183b29 {
+.container .content .token-property.data-v-2a183b29 {
   margin-top: 10px;
   font-size: 17px;
-  line-height: 20px;
-  word-break: break-all;
+  line-height: 17px;
 }
-.container .key .copyBtn.data-v-2a183b29 {
+.container .content .token-ApiKey-value.data-v-2a183b29 {
+  word-break: break-all;
+  color: #f86;
+  font-size: 20px;
+  height: 20px;
+  line-height: 20px;
+}
+.container .content .btn-container.data-v-2a183b29 {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 20px 0;
+}
+.container .content .btn-container .copyBtn.data-v-2a183b29,
+.container .content .btn-container .updateBtn.data-v-2a183b29 {
   background-color: #1d93ab;
   color: white;
-  margin-top: 10px;
-  margin-bottom: 40px;
+  width: 40%;
+}
+.container .content .desc-text.data-v-2a183b29 {
+  color: #aeb5bc;
+  font-size: 14px;
 }
 .container .btns.data-v-2a183b29 {
   display: flex;
