@@ -86,13 +86,19 @@
   height: 20px;
   line-height: 20px;
 }
+.container .content .updateBtn.data-v-2a183b29 {
+  margin: 20px auto;
+  background-color: #1d93ab;
+  color: white;
+  width: 90%;
+}
 .container .content .btn-container.data-v-2a183b29 {
   display: flex;
   justify-content: space-evenly;
   margin: 20px 0;
 }
 .container .content .btn-container .copyBtn.data-v-2a183b29,
-.container .content .btn-container .updateBtn.data-v-2a183b29 {
+.container .content .btn-container .clearStorageBtn.data-v-2a183b29 {
   background-color: #1d93ab;
   color: white;
   width: 40%;

@@ -54,15 +54,23 @@
               OneApi.ApiKey
             }}</text>
           </view>
+          <button class="updateBtn" @click="callExciteAd">增加 30 min</button>
           <view class="btn-container">
             <button class="copyBtn" @click="copyText(OneApi.ApiKey)">
               复制密码
             </button>
-            <button class="updateBtn" @click="callExciteAd">增加 30 min</button>
+            <button class="clearStorageBtn" @click="handleClearStorage">
+              清除缓存
+            </button>
           </view>
 
           <view class="desc-text">
-            加时规则：取当前时间与过期时间中的最大值，增加30分钟作为新的过期时间
+            <view>加时规则</view>
+            <view
+              >1.
+              取当前时间与过期时间中的最大值，增加30分钟作为新的过期时间</view
+            >
+            <view>2. 如若加时失败，可尝试清除缓存重新报名</view>
           </view>
         </view>
       </view>
@@ -184,6 +192,18 @@ export default {
     jumpPastTimePage(item) {
       uni.navigateTo({ url: `/pages/detail?info=${JSON.stringify(item)}` });
     },
+    resetData() {
+      this.OneApi = {
+        ApiKey_Name: "",
+        ApiKey: "",
+        Expire_Time: 0,
+      };
+    },
+    handleClearStorage() {
+      wx.clearStorageSync();
+      this.resetData();
+      showToast("缓存已清除", true);
+    },
   },
 };
 </script>
@@ -259,6 +279,12 @@ export default {
       height: 20px;
       line-height: 20px;
     }
+    .updateBtn {
+      margin: 20px auto;
+      background-color: rgb(29, 147, 171);
+      color: white;
+      width: 90%;
+    }
 
     .btn-container {
       display: flex;
@@ -266,7 +292,7 @@ export default {
       margin: 20px 0;
 
       .copyBtn,
-      .updateBtn {
+      .clearStorageBtn {
         background-color: rgb(29, 147, 171);
         color: white;
         width: 40%;

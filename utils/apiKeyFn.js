@@ -4,7 +4,12 @@ export const User_Authorization = {
   sVip: "60f7747a9589465c803ecefcbb4bd270",
 };
 
-export const Two_quarter = 35 * 60 * 1000; // 一刻钟(15min)单位是ms, 多加了5分钟
+export const Two_quarter = 30 * 60 * 1000; // 一刻钟(15min)单位是ms
+
+const tokenStatus = {
+  effective: 1, // 开启状态
+  invalid: 2, // 令牌禁用状态
+};
 
 // 生成 ApiKey
 function generateApiKey(nowTimeStamp) {
@@ -104,6 +109,27 @@ function updateExpiredTime(tokenRowData) {
   });
 }
 
+function changeTokenStatus(token_id) {
+  return new Promise((resolve) => {
+    uni.request({
+      url: `${One_Api_Base_Url}/api/token/?status_only=true`,
+      method: "put",
+      data: {
+        id: token_id,
+        status: tokenStatus.effective,
+      },
+      header: {
+        Authorization: `Bearer ${User_Authorization.sVip}`,
+      },
+      success: ({ data: response }) => {
+        if (response.success && response.data) {
+          resolve(true);
+        }
+      },
+    });
+  });
+}
+
 /*
  * @OneApi: { ApiKey_Name: string, ApiKey: string, Expire_Time: number单位是秒 }
  * return 同@OneApi
@@ -121,6 +147,12 @@ export async function updateToken() {
   }
 
   const targetOneApi = await updateExpiredTime(tokenRowData);
+
+  // 边界：如果令牌处于禁用状态, 则需要设置为开启状态
+  const oneApi_RowData = wx.getStorageSync("oneApi_RowData");
+  if (oneApi_RowData.status === tokenStatus.invalid) {
+    await changeTokenStatus(oneApi_RowData.id);
+  }
 
   return targetOneApi;
 }

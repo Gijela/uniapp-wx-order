@@ -10054,10 +10054,15 @@ var User_Authorization = {
   sVip: "60f7747a9589465c803ecefcbb4bd270"
 };
 exports.User_Authorization = User_Authorization;
-var Two_quarter = 35 * 60 * 1000; // 一刻钟(15min)单位是ms, 多加了5分钟
+var Two_quarter = 30 * 60 * 1000; // 一刻钟(15min)单位是ms
+exports.Two_quarter = Two_quarter;
+var tokenStatus = {
+  effective: 1,
+  // 开启状态
+  invalid: 2 // 令牌禁用状态
+};
 
 // 生成 ApiKey
-exports.Two_quarter = Two_quarter;
 function generateApiKey(nowTimeStamp) {
   return new Promise(function (resolve) {
     uni.request({
@@ -10187,6 +10192,27 @@ function updateExpiredTime(tokenRowData) {
     });
   });
 }
+function changeTokenStatus(token_id) {
+  return new Promise(function (resolve) {
+    uni.request({
+      url: "".concat(One_Api_Base_Url, "/api/token/?status_only=true"),
+      method: "put",
+      data: {
+        id: token_id,
+        status: tokenStatus.effective
+      },
+      header: {
+        Authorization: "Bearer ".concat(User_Authorization.sVip)
+      },
+      success: function success(_ref3) {
+        var response = _ref3.data;
+        if (response.success && response.data) {
+          resolve(true);
+        }
+      }
+    });
+  });
+}
 
 /*
  * @OneApi: { ApiKey_Name: string, ApiKey: string, Expire_Time: number单位是秒 }
@@ -10197,7 +10223,7 @@ function updateToken() {
 }
 function _updateToken() {
   _updateToken = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee2() {
-    var tokenRowData, curTimeStamp, targetOneApi;
+    var tokenRowData, curTimeStamp, targetOneApi, oneApi_RowData;
     return _regenerator.default.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
@@ -10212,8 +10238,17 @@ function _updateToken() {
             return updateExpiredTime(tokenRowData);
           case 4:
             targetOneApi = _context2.sent;
+            // 边界：如果令牌处于禁用状态, 则需要设置为开启状态
+            oneApi_RowData = wx.getStorageSync("oneApi_RowData");
+            if (!(oneApi_RowData.status === tokenStatus.invalid)) {
+              _context2.next = 9;
+              break;
+            }
+            _context2.next = 9;
+            return changeTokenStatus(oneApi_RowData.id);
+          case 9:
             return _context2.abrupt("return", targetOneApi);
-          case 6:
+          case 10:
           case "end":
             return _context2.stop();
         }
@@ -10300,28 +10335,7 @@ function formatTimestamp(timestamp) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 2)["default"], __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/wx.js */ 1)["default"]))
 
 /***/ }),
-/* 45 */,
-/* 46 */,
-/* 47 */,
-/* 48 */,
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */,
-/* 58 */,
-/* 59 */,
-/* 60 */,
-/* 61 */,
-/* 62 */,
-/* 63 */,
-/* 64 */,
-/* 65 */,
-/* 66 */
+/* 45 */
 /*!****************************************************************************!*\
   !*** /Users/dz0400351/Desktop/github-repo/tianya-uniapp/service/config.js ***!
   \****************************************************************************/
